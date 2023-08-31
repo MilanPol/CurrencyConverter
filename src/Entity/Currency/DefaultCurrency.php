@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\Currency\DefaultCurrencyRepository")
  */
 class DefaultCurrency
 {
@@ -34,6 +34,11 @@ class DefaultCurrency
     public function __construct()
     {
         $this->exchangeRateCurrencies = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     public function getCode(): ?string

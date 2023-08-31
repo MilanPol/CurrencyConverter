@@ -2,6 +2,7 @@
 
 namespace App\Controller\Security;
 
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,9 +13,6 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function login(?AuthenticationUtils $authenticationUtils): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
         $lastUsername = "unknown";
         $error = "none";
         // get the login error if there is one
@@ -30,6 +28,6 @@ class SecurityController extends AbstractController
     #[Route('/logout', name: 'app_logout')]
     public function logout()
     {
-        throw new \LogicException('You have been logged out');
+        throw new LogicException('You have been logged out');
     }
 }

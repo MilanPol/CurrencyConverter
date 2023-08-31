@@ -8,7 +8,7 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\Currency\ExchangeRateCurrencyRepository")
  */
 class ExchangeRateCurrency
 {
@@ -46,6 +46,10 @@ class ExchangeRateCurrency
      * )
      */
     public ?DefaultCurrency $defaultCurrency = null;
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getRate(): float
     {
