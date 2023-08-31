@@ -10,3 +10,7 @@
 /vendor/
 ###< symfony/framework-bundle ###
 /.docker/.env.nginx.local
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+###< squizlabs/php_codesniffer ###
