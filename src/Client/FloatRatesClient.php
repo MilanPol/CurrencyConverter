@@ -5,6 +5,7 @@ namespace App\Client;
 use App\DataObject\ExchangeRateDataObject;
 use App\DataObject\ExchangeRateListDataObject;
 use DateTime;
+use DateTimeZone;
 use stdClass;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -44,13 +45,22 @@ class FloatRatesClient extends HttpClient
 
     private function formatIntoExchangeRateDataObject(stdClass $contentObject)
     {
+        $updatedOn = $this->convertToServerTimeZone(new DateTime($contentObject->date));
+
         return new ExchangeRateDataObject(
             $contentObject->name,
             $contentObject->code,
             $contentObject->numericCode,
             $contentObject->rate,
             $contentObject->inverseRate,
-            new DateTime($contentObject->date),
+            $updatedOn,
         );
+    }
+
+    private function convertToServerTimeZone(DateTime $dateTime): DateTime
+    {
+        $dateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+
+        return $dateTime;
     }
 }
