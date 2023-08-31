@@ -68,12 +68,14 @@ final class UserFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return $this
-             ->afterInstantiate(function(User $user) {
-                 $hashedPassword = $this->passwordHasher
-                     ->hashPassword($user, $user->getPlainPassword());
+            ->afterInstantiate(
+                function (User $user) {
+                    $hashedPassword = $this->passwordHasher
+                        ->hashPassword($user, $user->getPlainPassword());
 
-                 $user->setPassword($hashedPassword);
-             });
+                    $user->setPassword($hashedPassword);
+                }
+            );
     }
 
     protected static function getClass(): string
