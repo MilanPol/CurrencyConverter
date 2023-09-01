@@ -41,7 +41,14 @@ You could change the name, user and password of the database in the `env` file a
 docker compose exec  php  bin/console doctrine:migrations:migrate
 ```
 
-2. Load fixtures for creating dummy users
+2. Create user admin user
 ```
-docker compose exec  php  bin/console bin/console doctrine:fixtures:load
+docker compose exec  php  bin/console create:user user@userdomain.com userpassword ROLE_ADMIN
 ```
+
+3. Import or update currency exchange rates
+```
+docker compose exec  php  bin/console import:exchange-rate:currencies
+```
+
+4. Go to http://127.0.0.1/dashboard

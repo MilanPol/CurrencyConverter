@@ -11,6 +11,6 @@ class IndexController extends AbstractController
     #[Route(path: '/', name: 'main', methods: ['GET'])]
     public function list(): Response
     {
-        return new Response('Initial controller');
+        return $this->redirectToRoute('dashboard');
     }
 }
