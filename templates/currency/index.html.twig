@@ -1,0 +1,35 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+{% block main %}
+  {{ form(form) }}
+  {% if exchangeRateByCurrencies is defined %}
+    <table>
+      <thead>
+      <tr>
+        <th colspan="2">Converted currencies</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <th>
+          Currency
+        </th>
+        {% for currency, exchangeRateByCurrency in exchangeRateByCurrencies %}
+          <th>
+            {{ currency }}
+          </th>
+        {% endfor %}
+      </tr>
+      <tr>
+        <th>
+          Exchanged Amount
+        </th>
+        {% for currency, exchangeRateByCurrency in exchangeRateByCurrencies %}
+          <td>
+            {{ exchangeRateByCurrency }}
+          </td>
+        {% endfor %}
+      </tr>
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

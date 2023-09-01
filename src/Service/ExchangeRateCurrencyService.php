@@ -3,9 +3,13 @@
 namespace App\Service;
 
 use App\Client\FloatRatesClient;
+use App\Constants\DefaultCurrencyConstants;
 use App\DataObject\ExchangeRateDataObject;
 use App\Entity\Currency\DefaultCurrency;
 use App\Entity\Currency\ExchangeRateCurrency;
+use App\Repository\Currency\ExchangeRateCurrencyRepository;
+use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ExchangeRateCurrencyService
@@ -31,6 +35,19 @@ class ExchangeRateCurrencyService
         );
         if (!$defaultCurrencyEntity) {
             $defaultCurrencyEntity = $this->createDefaultCurrency($defaultCurrency);
+        }
+
+        /** @var ExchangeRateCurrencyRepository $exchangeRateCurrencyRepository */
+        $exchangeRateCurrencyRepository = $this->entityManager->getRepository(ExchangeRateCurrency::class);
+        $defaultExchangeCurrency = $exchangeRateCurrencyRepository->findOneBy(
+            [
+                'targetCurrencyCode' => strtoupper($defaultCurrencyEntity->getCode()),
+                'defaultCurrency' => $defaultCurrencyEntity
+            ]
+        );
+
+        if (!$defaultExchangeCurrency) {
+            $this->createDefaultCurrencyExchangeRateCurrency($defaultCurrencyEntity);
         }
 
         /** @var ExchangeRateDataObject $exchangeRateDataObject */
@@ -85,5 +102,56 @@ class ExchangeRateCurrencyService
         $existingEntity->setUpdatedOn($dataObject->getUpdatedOn());
         $this->entityManager->persist($existingEntity);
         $this->entityManager->flush();
+    }
+
+    private function createDefaultCurrencyExchangeRateCurrency(
+        DefaultCurrency $defaultCurrency
+    ): void {
+        $exchangeRateEntity = new ExchangeRateCurrency();
+        $exchangeRateEntity->setRate(1);
+        $exchangeRateEntity->setInverseRate(1);
+        $exchangeRateEntity->setTargetCurrencyCode(strtoupper($defaultCurrency->getCode()));
+        $exchangeRateEntity->setUpdatedOn(new DateTime());
+        $exchangeRateEntity->setDefaultCurrency($defaultCurrency);
+        $this->entityManager->persist($exchangeRateEntity);
+        $this->entityManager->flush();
+    }
+
+    public function getExchangeRatesForCurrencyByAmount(
+        ExchangeRateCurrency $fromExchangeCurrency,
+        float $amount,
+        ArrayCollection $toExchangeCurrencies
+    ): array {
+
+        $toExchangeRateCalculated = [];
+        /** @var ExchangeRateCurrency $toExchangeCurrency */
+        foreach ($toExchangeCurrencies as $toExchangeCurrency) {
+            $toExchangeRateCalculated[
+                $toExchangeCurrency->getTargetCurrencyCode()
+            ] = $this->calculateAmountFromExchangeRateToExchangeRate(
+                $amount,
+                $fromExchangeCurrency,
+                $toExchangeCurrency
+            );
+        }
+
+        return $toExchangeRateCalculated;
+    }
+
+    private function calculateAmountFromExchangeRateToExchangeRate(
+        float $amount,
+        ExchangeRateCurrency $fromExchangeCurrency,
+        ExchangeRateCurrency $toExchangeCurrency
+    ): float {
+        $dollarAmount = $fromExchangeCurrency->getInverseRate() * $amount;
+
+        if (
+            $toExchangeCurrency->getTargetCurrencyCode() === strtoupper(
+                DefaultCurrencyConstants::DEFAULT_CURRENCY
+            )
+        ) {
+            return $dollarAmount;
+        }
+        return $toExchangeCurrency->getRate() * $dollarAmount;
     }
 }
