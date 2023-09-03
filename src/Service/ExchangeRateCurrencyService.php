@@ -7,28 +7,34 @@ use App\Constants\DefaultCurrencyConstants;
 use App\DataObject\ExchangeRateDataObject;
 use App\Entity\Currency\DefaultCurrency;
 use App\Entity\Currency\ExchangeRateCurrency;
+use App\Repository\Currency\DefaultCurrencyRepository;
 use App\Repository\Currency\ExchangeRateCurrencyRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
 class ExchangeRateCurrencyService
 {
     private FloatRatesClient $floatRatesClient;
     private EntityManagerInterface $entityManager;
+    private DefaultCurrencyRepository|EntityRepository $defaultCurrencyRepository;
+    private ExchangeRateCurrencyRepository|EntityRepository $exchangeRateCurrencyRepository;
 
     public function __construct(
         FloatRatesClient $floatRatesClient,
-        EntityManagerInterface $entityManager,
+        EntityManagerInterface $entityManager
     ) {
         $this->floatRatesClient = $floatRatesClient;
         $this->entityManager = $entityManager;
+        $this->defaultCurrencyRepository = $entityManager->getRepository(DefaultCurrency::class);
+        $this->exchangeRateCurrencyRepository = $entityManager->getRepository(ExchangeRateCurrency::class);
     }
 
     public function importExchangeRateCurrencies(string $defaultCurrency): bool
     {
         $currencyExchangeRateList = $this->floatRatesClient->getExchangeRatesForCurrency($defaultCurrency);
-        $defaultCurrencyEntity = $this->entityManager->getRepository(DefaultCurrency::class)->findOneBy(
+        $defaultCurrencyEntity = $this->defaultCurrencyRepository->findOneBy(
             [
                 'code' => $defaultCurrency
             ]
@@ -37,9 +43,7 @@ class ExchangeRateCurrencyService
             $defaultCurrencyEntity = $this->createDefaultCurrency($defaultCurrency);
         }
 
-        /** @var ExchangeRateCurrencyRepository $exchangeRateCurrencyRepository */
-        $exchangeRateCurrencyRepository = $this->entityManager->getRepository(ExchangeRateCurrency::class);
-        $defaultExchangeCurrency = $exchangeRateCurrencyRepository->findOneBy(
+        $defaultExchangeCurrency = $this->exchangeRateCurrencyRepository->findOneBy(
             [
                 'targetCurrencyCode' => strtoupper($defaultCurrencyEntity->getCode()),
                 'defaultCurrency' => $defaultCurrencyEntity
@@ -52,7 +56,7 @@ class ExchangeRateCurrencyService
 
         /** @var ExchangeRateDataObject $exchangeRateDataObject */
         foreach ($currencyExchangeRateList->getCurrencyExchangeRates() as $exchangeRateDataObject) {
-            $existingEntity = $this->entityManager->getRepository(ExchangeRateCurrency::class)->findOneBy(
+            $existingEntity = $this->exchangeRateCurrencyRepository->findOneBy(
                 [
                     'targetCurrencyCode' => $exchangeRateDataObject->getCode(),
                     'defaultCurrency' => $defaultCurrencyEntity

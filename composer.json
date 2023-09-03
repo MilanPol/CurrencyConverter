@@ -27,8 +27,12 @@
   "require-dev": {
     "doctrine/doctrine-fixtures-bundle": "^3.4",
     "phpmd/phpmd": "^2.13",
+    "phpunit/phpunit": "^9.5",
     "squizlabs/php_codesniffer": "^3.7",
+    "symfony/browser-kit": "6.2.*",
+    "symfony/css-selector": "6.2.*",
     "symfony/maker-bundle": "^1.48",
+    "symfony/phpunit-bridge": "^6.3",
     "symfony/stopwatch": "6.2.*",
     "symfony/web-profiler-bundle": "6.2.*"
   },
@@ -68,16 +72,17 @@
     },
     "phpcs": "php vendor/bin/phpcs --standard=phpcs.xml src --colors -q --extensions=php",
     "phpmd": "php vendor/bin/phpmd src xml phpmd.xml",
+    "phpunit": "php vendor/bin/phpunit",
     "post-install-cmd": [
       "@auto-scripts"
     ],
-    "whitelist-ip": "to be build\n",
     "post-update-cmd": [
       "@auto-scripts"
     ],
     "qa": [
       "@phpcs",
-      "@phpmd"
+      "@phpmd",
+      "@phpunit"
     ]
   },
   "conflict": {
