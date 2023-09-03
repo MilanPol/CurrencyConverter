@@ -1,4 +1,6 @@
 framework:
+    php_errors:
+        log: true
     test: true
     session:
         storage_id: session.storage.mock_file

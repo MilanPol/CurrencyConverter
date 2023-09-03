@@ -3,7 +3,9 @@
 namespace App\Command;
 
 use App\Constants\DefaultCurrencyConstants;
+use App\DataObject\LogContextDataObject;
 use App\Service\ExchangeRateCurrencyService;
+use App\Service\LogService;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,12 +20,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ExchangeRateCurrencyImportCommand extends Command
 {
     private ExchangeRateCurrencyService $currencyService;
+    private LogService $logService;
 
     public function __construct(
-        ExchangeRateCurrencyService $currencyService
+        ExchangeRateCurrencyService $currencyService,
+        LogService $logService,
     ) {
         parent::__construct();
         $this->currencyService = $currencyService;
+        $this->logService = $logService;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -34,9 +39,29 @@ class ExchangeRateCurrencyImportCommand extends Command
             $this->currencyService->importExchangeRateCurrencies(DefaultCurrencyConstants::DEFAULT_CURRENCY_CODE);
         } catch (Exception $exception) {
             $inputOutput->error($exception->getMessage());
-        }
-        $inputOutput->success('Exchange rate for currencies have been successfully imported');
+            $logMessage = sprintf(
+                'Currency exchange rate import has failed because of the following error %s',
+                $exception->getMessage()
+            );
 
+            $this->logService->addException(
+                get_class($this),
+                __FUNCTION__,
+                LogContextDataObject::ERROR,
+                $logMessage,
+                $exception
+            );
+            $this->logService->logContext();
+            return Command::FAILURE;
+        }
+        $logMessage = 'Exchange rate for currencies have been successfully imported';
+        $this->logService->addInfoLog(
+            get_class($this),
+            __FUNCTION__,
+            $logMessage
+        );
+
+        $inputOutput->success($logMessage);
         return Command::SUCCESS;
     }
 }

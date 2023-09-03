@@ -2,18 +2,16 @@
 
 namespace App\Command;
 
-use App\Constants\DefaultCurrencyConstants;
-use App\Service\ExchangeRateCurrencyService;
+use App\DataObject\LogContextDataObject;
+use App\Service\LogService;
 use App\Service\UserService;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 #[AsCommand(
     name: 'create:user',
@@ -22,12 +20,15 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 class CreateUserCommand extends Command
 {
     private UserService $userService;
+    private LogService $logService;
 
     public function __construct(
-        UserService $userService
+        UserService $userService,
+        LogService $logService
     ) {
         parent::__construct();
         $this->userService = $userService;
+        $this->logService = $logService;
     }
 
     protected function configure()
@@ -61,11 +62,29 @@ class CreateUserCommand extends Command
 
             $this->userService->createUser($email, $password, $role);
         } catch (Exception $exception) {
-            $inputOutput->error($exception->getMessage());
+            $logMessage = sprintf(
+                'User creation has failed because of the following error %s',
+                $exception->getMessage()
+            );
 
+            $this->logService->addException(
+                get_class($this),
+                __FUNCTION__,
+                LogContextDataObject::ERROR,
+                $logMessage,
+                $exception
+            );
+            $this->logService->logContext();
             return Command::FAILURE;
         }
-        $inputOutput->success('User has been successfully created');
+        $logMessage = 'User has been successfully created';
+        $this->logService->addInfoLog(
+            get_class($this),
+            __FUNCTION__,
+            $logMessage
+        );
+
+        $inputOutput->success($logMessage);
 
         return Command::SUCCESS;
     }
