@@ -1,16 +1,20 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
+{% block page_title %}
+  Currency exchange
+{% endblock %}
 {% block main %}
+  {% form_theme form '@EasyAdmin/crud/form_theme.html.twig' %}
   {{ form(form) }}
   {% if exchangeRateByCurrencies is defined %}
     <table>
       <thead>
       <tr>
-        <th colspan="2">Converted currencies</th>
+        <th colspan="6"><h3>Converted currencies</h3></th>
       </tr>
       </thead>
       <tbody>
       <tr>
-        <th>
+        <th style="padding-right: 15px">
           Currency
         </th>
         {% for currency, exchangeRateByCurrency in exchangeRateByCurrencies %}
@@ -20,11 +24,11 @@
         {% endfor %}
       </tr>
       <tr>
-        <th>
+        <th style="padding-right: 15px">
           Exchanged Amount
         </th>
         {% for currency, exchangeRateByCurrency in exchangeRateByCurrencies %}
-          <td>
+          <td style="padding-right: 15px">
             {{ exchangeRateByCurrency }}
           </td>
         {% endfor %}

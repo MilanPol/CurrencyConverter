@@ -28,7 +28,7 @@ class ExchangeRateCompareFormType extends AbstractType
                     'class' => ExchangeRateCurrency::class,
                     'multiple' => false,
                     'choice_label' => static function (ExchangeRateCurrency $exchangeRateCurrency): string {
-                        return (string)$exchangeRateCurrency->getTargetCurrencyCode();
+                        return (string)$exchangeRateCurrency->getFullName();
                     },
                     'label' => 'From exchange rate',
                 ]
@@ -53,9 +53,10 @@ class ExchangeRateCompareFormType extends AbstractType
                 EntityType::class,
                 [
                     'class' => ExchangeRateCurrency::class,
+                    'expanded' => true,
                     'multiple' => true,
                     'choice_label' => static function (ExchangeRateCurrency $exchangeRateCurrency): string {
-                        return (string)$exchangeRateCurrency->getTargetCurrencyCode();
+                        return (string)$exchangeRateCurrency->getFullName();
                     },
                     'label' => 'To exchange rate',
                 ]

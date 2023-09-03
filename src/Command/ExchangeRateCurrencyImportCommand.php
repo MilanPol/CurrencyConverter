@@ -31,7 +31,7 @@ class ExchangeRateCurrencyImportCommand extends Command
         $inputOutput = new SymfonyStyle($input, $output);
 
         try {
-            $this->currencyService->importExchangeRateCurrencies(DefaultCurrencyConstants::DEFAULT_CURRENCY);
+            $this->currencyService->importExchangeRateCurrencies(DefaultCurrencyConstants::DEFAULT_CURRENCY_CODE);
         } catch (Exception $exception) {
             $inputOutput->error($exception->getMessage());
         }

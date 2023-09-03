@@ -72,6 +72,7 @@ class ExchangeRateCurrencyService
         DefaultCurrency $defaultCurrency
     ): void {
         $exchangeRateEntity = new ExchangeRateCurrency();
+        $exchangeRateEntity->setFullName($dataObject->getName());
         $exchangeRateEntity->setRate($dataObject->getRate());
         $exchangeRateEntity->setInverseRate($dataObject->getInverseRate());
         $exchangeRateEntity->setTargetCurrencyCode($dataObject->getCode());
@@ -96,6 +97,7 @@ class ExchangeRateCurrencyService
         ExchangeRateCurrency $existingEntity,
         ExchangeRateDataObject $dataObject
     ): void {
+        $existingEntity->setFullName($dataObject->getName());
         $existingEntity->setRate($dataObject->getRate());
         $existingEntity->setInverseRate($dataObject->getInverseRate());
         $existingEntity->setTargetCurrencyCode($dataObject->getCode());
@@ -108,6 +110,7 @@ class ExchangeRateCurrencyService
         DefaultCurrency $defaultCurrency
     ): void {
         $exchangeRateEntity = new ExchangeRateCurrency();
+        $exchangeRateEntity->setFullName(DefaultCurrencyConstants::DEFAULT_CURRENCY_NAME);
         $exchangeRateEntity->setRate(1);
         $exchangeRateEntity->setInverseRate(1);
         $exchangeRateEntity->setTargetCurrencyCode(strtoupper($defaultCurrency->getCode()));
@@ -127,7 +130,7 @@ class ExchangeRateCurrencyService
         /** @var ExchangeRateCurrency $toExchangeCurrency */
         foreach ($toExchangeCurrencies as $toExchangeCurrency) {
             $toExchangeRateCalculated[
-                $toExchangeCurrency->getTargetCurrencyCode()
+                $toExchangeCurrency->getFullName()
             ] = $this->calculateAmountFromExchangeRateToExchangeRate(
                 $amount,
                 $fromExchangeCurrency,
@@ -147,7 +150,7 @@ class ExchangeRateCurrencyService
 
         if (
             $toExchangeCurrency->getTargetCurrencyCode() === strtoupper(
-                DefaultCurrencyConstants::DEFAULT_CURRENCY
+                DefaultCurrencyConstants::DEFAULT_CURRENCY_CODE
             )
         ) {
             return $dollarAmount;

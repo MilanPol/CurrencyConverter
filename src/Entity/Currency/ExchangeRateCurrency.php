@@ -39,6 +39,12 @@ class ExchangeRateCurrency
      */
     private ?string $targetCurrencyCode;
 
+
+    /**
+     * @ORM\Column(type="string", nullable="false")
+     */
+    private ?string $fullName;
+
     /**
      * @ORM\ManyToOne(
      *     targetEntity="DefaultCurrency",
@@ -89,6 +95,16 @@ class ExchangeRateCurrency
     public function setTargetCurrencyCode(?string $targetCurrencyCode): void
     {
         $this->targetCurrencyCode = $targetCurrencyCode;
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(?string $fullName): void
+    {
+        $this->fullName = $fullName;
     }
 
     public function getDefaultCurrency(): ?DefaultCurrency
