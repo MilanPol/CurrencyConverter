@@ -52,3 +52,19 @@ docker compose exec  php  bin/console import:exchange-rate:currencies
 ```
 
 4. Go to http://127.0.0.1/dashboard
+
+
+## Allow and disallow IP's access to application
+
+1. Go to .docker/nginx/whitelist.conf
+
+2. Replace file contents with 
+```
+allow  your ip;
+deny all;
+```
+
+3. Run command to rebuild and restart containers
+```
+docker compose up -d --force-recreate --build
+```
